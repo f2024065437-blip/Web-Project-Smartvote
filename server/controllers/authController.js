@@ -98,14 +98,20 @@ const login = async (req, res) => {
     }
     
     try {
-        // FIRST: Check in users table
+        // ✅ FIRST: Check in users table
+        console.log('🔍 Checking users table first...');
         let userResult = await getOne('SELECT * FROM users WHERE email = $1', [email]);
         let role = 'voter';
         let isAdmin = false;
         
-        // SECOND: If not found, check in admins table
-        if (!userResult.success || !userResult.data) {
-            console.log('Checking admins table...');
+        // ✅ If found in users table
+        if (userResult.success && userResult.data) {
+            console.log('✅ User found in users table');
+            console.log('👤 User role from DB:', userResult.data.role);
+            role = userResult.data.role || 'voter';
+        } else {
+            // ✅ SECOND: If not found, check in admins table
+            console.log('🔍 User not in users table, checking admins table...');
             const adminResult = await getOne('SELECT * FROM admins WHERE email = $1', [email]);
             if (adminResult.success && adminResult.data) {
                 userResult = adminResult;
@@ -116,7 +122,7 @@ const login = async (req, res) => {
         }
         
         if (!userResult.success || !userResult.data) {
-            console.log('❌ User not found');
+            console.log('❌ User not found in any table');
             return res.status(401).json({ 
                 success: false, 
                 message: 'Invalid credentials' 
@@ -125,7 +131,7 @@ const login = async (req, res) => {
         
         const user = userResult.data;
         console.log('✅ User found:', user.email);
-        console.log('✅ User role from DB:', role);
+        console.log('✅ Role:', role);
         
         // Compare passwords
         const isValid = await bcrypt.compare(password, user.password);

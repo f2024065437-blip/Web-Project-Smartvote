@@ -980,6 +980,37 @@ body.dark .admin-dropdown-content {
     background: #1e293b !important;
     border-color: #334155 !important;
 }
+/* Admin Dropdown - Hover to Show */
+.admin-dropdown:hover .admin-dropdown-content {
+    display: block !important;
+}
+
+/* Light Mode */
+.admin-dropdown-content {
+    background: white !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+
+.admin-dropdown-content a {
+    color: #1e293b !important;
+    padding: 0.6rem 1.2rem !important;
+    display: block !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.admin-dropdown-content a:hover {
+    background: #f1f5f9 !important;
+    color: #6366f1 !important;
+}
+
+/* Dark Mode */
+body.dark .admin-dropdown-content {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
 
 body.dark .admin-dropdown-content a {
     color: #e2e8f0 !important;
@@ -989,7 +1020,6 @@ body.dark .admin-dropdown-content a:hover {
     background: #334155 !important;
     color: #6366f1 !important;
 }
-
 /* Stats cards in dark mode */
 body.dark .stat-card {
     background: #1e293b !important;

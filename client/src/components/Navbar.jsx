@@ -196,38 +196,101 @@ const Navbar = () => {
                 Profile
               </Link>
 
-              {isAdmin && (
-                <div style={{ position: 'relative', display: 'inline-block' }}>
-                  <button
-                    style={{
-                      padding: '0.5rem 1rem',
-                      fontSize: '0.85rem',
-                      fontWeight: '600',
-                      borderRadius: '8px',
-                      background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                      color: 'white',
-                      border: 'none',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.transform = 'translateY(-2px)';
-                      e.target.style.boxShadow = '0 4px 16px rgba(99, 102, 241, 0.4)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.transform = 'translateY(0)';
-                      e.target.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.3)';
-                    }}
-                  >
-                    ⚡ Admin
-                  </button>
-                </div>
-              )}
-
+             {isAdmin && (
+  <div className="admin-dropdown" style={{ position: 'relative', display: 'inline-block' }}>
+    <button
+      className="admin-dropdown-btn"
+      style={{
+        padding: '0.5rem 1rem',
+        fontSize: '0.85rem',
+        fontWeight: '600',
+        borderRadius: '8px',
+        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+        color: 'white',
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem'
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.transform = 'translateY(-2px)';
+        e.target.style.boxShadow = '0 4px 16px rgba(99, 102, 241, 0.4)';
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.transform = 'translateY(0)';
+        e.target.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.3)';
+      }}
+    >
+      ⚡ Admin Panel ▼
+    </button>
+    <div 
+      className="admin-dropdown-content"
+      style={{
+        position: 'absolute',
+        top: '100%',
+        left: '0',
+        marginTop: '0.5rem',
+        background: isDark ? '#1e293b' : 'white',
+        border: `1px solid ${isDark ? 'rgba(51, 65, 85, 0.5)' : 'rgba(229, 231, 235, 0.5)'}`,
+        borderRadius: '8px',
+        minWidth: '200px',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+        zIndex: 1000,
+        display: 'none',
+        padding: '0.5rem 0'
+      }}
+    >
+      <Link to="/admin/dashboard" style={{ 
+        display: 'block', 
+        padding: '0.6rem 1.2rem', 
+        textDecoration: 'none', 
+        color: isDark ? '#e2e8f0' : '#1e293b',
+        transition: 'all 0.2s ease'
+      }}>
+        📊 Dashboard
+      </Link>
+      <Link to="/admin/elections" style={{ 
+        display: 'block', 
+        padding: '0.6rem 1.2rem', 
+        textDecoration: 'none', 
+        color: isDark ? '#e2e8f0' : '#1e293b',
+        transition: 'all 0.2s ease'
+      }}>
+        🗳️ Elections
+      </Link>
+      <Link to="/admin/candidates" style={{ 
+        display: 'block', 
+        padding: '0.6rem 1.2rem', 
+        textDecoration: 'none', 
+        color: isDark ? '#e2e8f0' : '#1e293b',
+        transition: 'all 0.2s ease'
+      }}>
+        👥 Candidates
+      </Link>
+      <Link to="/admin/users" style={{ 
+        display: 'block', 
+        padding: '0.6rem 1.2rem', 
+        textDecoration: 'none', 
+        color: isDark ? '#e2e8f0' : '#1e293b',
+        transition: 'all 0.2s ease'
+      }}>
+        👤 Users
+      </Link>
+      <Link to="/admin/reports" style={{ 
+        display: 'block', 
+        padding: '0.6rem 1.2rem', 
+        textDecoration: 'none', 
+        color: isDark ? '#e2e8f0' : '#1e293b',
+        transition: 'all 0.2s ease'
+      }}>
+        📈 Reports
+      </Link>
+    </div>
+  </div>
+)}
               <button
                 onClick={handleLogout}
                 style={{

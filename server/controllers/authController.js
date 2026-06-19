@@ -87,7 +87,6 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     
     console.log('🔑 Login attempt for:', email);
-    console.log('📝 Password received:', password);
     
     if (!email || !password) {
         return res.status(400).json({ 
@@ -97,23 +96,10 @@ const login = async (req, res) => {
     }
     
     try {
-        // Check in users table first
-        let user = await getOne('SELECT * FROM users WHERE email = ?', [email]);
-        let role = user.data.role || 'voter';
+        // Check in users table
+        const userResult = await getOne('SELECT * FROM users WHERE email = $1', [email]);
         
-        // If not found in users, check admins
-        if (!user.success || !user.data) {
-            console.log('Checking admins table...');
-            const adminResult = await getOne('SELECT * FROM admins WHERE email = ?', [email]);
-            if (adminResult.success && adminResult.data) {
-                user = adminResult;
-                role = 'admin';
-                console.log('✅ Admin found in admins table');
-            }
-        }
-        
-        // If user not found
-        if (!user.success || !user.data) {
+        if (!userResult.success || !userResult.data) {
             console.log('❌ User not found');
             return res.status(401).json({ 
                 success: false, 
@@ -121,11 +107,12 @@ const login = async (req, res) => {
             });
         }
         
-        console.log('✅ User found:', user.data.email);
-        console.log('🔑 Stored password hash:', user.data.password);
+        const user = userResult.data;
+        console.log('✅ User found:', user.email);
+        console.log('✅ User role from DB:', user.role);
         
         // Compare passwords
-        const isValid = await bcrypt.compare(password, user.data.password);
+        const isValid = await bcrypt.compare(password, user.password);
         console.log('✅ Password valid:', isValid);
         
         if (!isValid) {
@@ -135,21 +122,25 @@ const login = async (req, res) => {
             });
         }
         
+        // Get the role from the database
+        const role = user.role || 'voter';
+        console.log('✅ Returning role:', role);
+        
         // Generate token
         const token = jwt.sign(
-    { id: user.data.id, email: user.data.email, role: role },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRE || '7d' }
-);
+            { id: user.id, email: user.email, role: role },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRE || '7d' }
+        );
         
         console.log('✅ Login successful for:', email);
         
         res.json({
             success: true,
             data: {
-                id: user.data.id,
-                fullname: user.data.fullname || user.data.username || 'User',
-                email: user.data.email,
+                id: user.id,
+                fullname: user.fullname || 'User',
+                email: user.email,
                 role: role,
                 token: token
             }
@@ -163,7 +154,6 @@ const login = async (req, res) => {
         });
     }
 };
-
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
     const user = await getOne('SELECT * FROM users WHERE email = ?', [email]);

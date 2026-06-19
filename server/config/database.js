@@ -70,17 +70,21 @@ const getOne = async (sql, params = []) => {
 const insertOne = async (sql, params = []) => {
     try {
         if (isPostgres) {
-            const result = await pool.query(sql + ' RETURNING id', params);
-            return { success: true, id: result.rows[0].id };
+            // PostgreSQL (Neon)
+            const result = await pool.query(sql, params);
+            return { success: true, id: result.rows[0]?.id || result.rows[0]?.insertId || null };
         } else {
+            // MySQL
             const [result] = await promisePool.query(sql, params);
             return { success: true, id: result.insertId };
         }
     } catch (error) {
+        console.error('❌ Insert error:', error.message);
+        console.error('SQL:', sql);
+        console.error('Params:', params);
         return { success: false, error: error.message };
     }
 };
-
 const updateRecord = async (sql, params = []) => {
     try {
         if (isPostgres) {

@@ -42,12 +42,11 @@ const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = generateRandomToken();
 
-        const result = await insertOne(
-            `INSERT INTO users (fullname, email, password, department, student_id, verification_token, email_verified) 
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [fullname, email, hashedPassword, department || null, student_id || null, verificationToken, 1]
-        );
-
+       const result = await insertOne(
+    `INSERT INTO users (fullname, email, password, department, student_id, verification_token, email_verified) 
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+    [fullname, email, hashedPassword, department || null, student_id || null, verificationToken, true]
+);
         if (result.success) {
             console.log(`✅ User registered: ${email}`);
             res.status(201).json({

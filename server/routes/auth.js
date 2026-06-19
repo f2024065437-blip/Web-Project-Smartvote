@@ -7,7 +7,7 @@ const { validateRegistration, validateLogin } = require('../middleware/validatio
 
 router.post('/register', validateRegistration, register);
 router.get('/verify-email/:token', verifyEmail);
-router.post('/login', validateLogin, authLimiter, login);  // ← This must exist
+router.post('/login', validateLogin, login);  // ← Removed authLimiter  // ← This must exist
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 router.post('/logout', verifyToken, logout);

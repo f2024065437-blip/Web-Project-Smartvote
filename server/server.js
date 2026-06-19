@@ -10,13 +10,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: [
-        'https://web-project-smartvote-mamr8gwfq-saif23.vercel.app',  // ← YOUR ACTUAL URL
-        'https://web-project-smartvote.vercel.app',
-        'https://smartvote.vercel.app',
-        'http://localhost:3000'
-    ],
-    credentials: true,
+    origin: '*',  // Allows ALL origins
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));

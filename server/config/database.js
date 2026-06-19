@@ -1,22 +1,43 @@
 const mysql = require('mysql2');
 require('dotenv').config();
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'smartvote_db',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
+// Check if using PostgreSQL (Neon)
+const isPostgres = process.env.DATABASE_URL && process.env.DATABASE_URL.includes('postgresql');
 
-const promisePool = pool.promise();
+let pool;
+
+if (isPostgres) {
+    // PostgreSQL (Neon)
+    const { Pool } = require('pg');
+    pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }
+    });
+} else {
+    // MySQL
+    pool = mysql.createPool({
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        database: process.env.DB_NAME || 'smartvote_db',
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
+    });
+}
+
+const promisePool = pool.promise ? pool.promise() : pool;
 
 const testConnection = async () => {
     try {
-        await promisePool.query('SELECT 1');
-        console.log('✅ MySQL Database connected');
+        if (isPostgres) {
+            const client = await pool.connect();
+            await client.query('SELECT 1');
+            client.release();
+        } else {
+            await promisePool.query('SELECT 1');
+        }
+        console.log('✅ Database connected');
         return true;
     } catch (error) {
         console.error('❌ Database connection failed:', error.message);
@@ -26,10 +47,14 @@ const testConnection = async () => {
 
 const executeQuery = async (sql, params = []) => {
     try {
-        const [rows] = await promisePool.query(sql, params);
-        return { success: true, data: rows };
+        if (isPostgres) {
+            const result = await pool.query(sql, params);
+            return { success: true, data: result.rows };
+        } else {
+            const [rows] = await promisePool.query(sql, params);
+            return { success: true, data: rows };
+        }
     } catch (error) {
-        console.error('Query error:', error.message);
         return { success: false, error: error.message };
     }
 };
@@ -44,20 +69,27 @@ const getOne = async (sql, params = []) => {
 
 const insertOne = async (sql, params = []) => {
     try {
-        const [result] = await promisePool.query(sql, params);
-        return { success: true, id: result.insertId };
+        if (isPostgres) {
+            const result = await pool.query(sql + ' RETURNING id', params);
+            return { success: true, id: result.rows[0].id };
+        } else {
+            const [result] = await promisePool.query(sql, params);
+            return { success: true, id: result.insertId };
+        }
     } catch (error) {
-        console.error('Insert error:', error.message);
         return { success: false, error: error.message };
     }
 };
 
 const updateRecord = async (sql, params = []) => {
     try {
-        const [result] = await promisePool.query(sql, params);
-        return { success: true, affectedRows: result.affectedRows };
+        if (isPostgres) {
+            await pool.query(sql, params);
+        } else {
+            await promisePool.query(sql, params);
+        }
+        return { success: true };
     } catch (error) {
-        console.error('Update error:', error.message);
         return { success: false, error: error.message };
     }
 };

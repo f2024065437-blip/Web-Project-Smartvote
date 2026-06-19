@@ -96,8 +96,22 @@ const login = async (req, res) => {
     }
     
     try {
-        // Check in users table
-        const userResult = await getOne('SELECT * FROM users WHERE email = $1', [email]);
+        // FIRST: Check in users table
+        let userResult = await getOne('SELECT * FROM users WHERE email = $1', [email]);
+        let role = 'voter';
+        let isAdmin = false;
+        
+        // SECOND: If not found, check in admins table
+        if (!userResult.success || !userResult.data) {
+            console.log('Checking admins table...');
+            const adminResult = await getOne('SELECT * FROM admins WHERE email = $1', [email]);
+            if (adminResult.success && adminResult.data) {
+                userResult = adminResult;
+                role = 'admin';
+                isAdmin = true;
+                console.log('✅ Admin found in admins table');
+            }
+        }
         
         if (!userResult.success || !userResult.data) {
             console.log('❌ User not found');
@@ -109,7 +123,7 @@ const login = async (req, res) => {
         
         const user = userResult.data;
         console.log('✅ User found:', user.email);
-        console.log('✅ User role from DB:', user.role);
+        console.log('✅ User role from DB:', role);
         
         // Compare passwords
         const isValid = await bcrypt.compare(password, user.password);
@@ -122,13 +136,13 @@ const login = async (req, res) => {
             });
         }
         
-        // Get the role from the database
-        const role = user.role || 'voter';
-        console.log('✅ Returning role:', role);
+        // Get the role
+        const finalRole = isAdmin ? 'admin' : (user.role || 'voter');
+        console.log('✅ Returning role:', finalRole);
         
         // Generate token
         const token = jwt.sign(
-            { id: user.id, email: user.email, role: role },
+            { id: user.id, email: user.email, role: finalRole },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRE || '7d' }
         );
@@ -139,9 +153,9 @@ const login = async (req, res) => {
             success: true,
             data: {
                 id: user.id,
-                fullname: user.fullname || 'User',
+                fullname: user.fullname || user.username || 'User',
                 email: user.email,
-                role: role,
+                role: finalRole,
                 token: token
             }
         });

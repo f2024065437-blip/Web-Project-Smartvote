@@ -13,10 +13,16 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
     
+    console.log('🔍 AuthProvider - Token:', token);
+    console.log('🔍 AuthProvider - User Data:', userData);
+    
     if (token && userData) {
       try {
-        setUser(JSON.parse(userData));
+        const parsed = JSON.parse(userData);
+        console.log('✅ User set:', parsed);
+        setUser(parsed);
       } catch (e) {
+        console.error('❌ Error parsing user:', e);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }
@@ -25,6 +31,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData) => {
+    console.log('🔑 Login called:', userData);
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
   };
@@ -41,7 +48,7 @@ export const AuthProvider = ({ children }) => {
       login, 
       logout, 
       loading, 
-      isAuthenticated: !!user  // ← This is what makes isAuthenticated work!
+      isAuthenticated: !!user 
     }}>
       {children}
     </AuthContext.Provider>

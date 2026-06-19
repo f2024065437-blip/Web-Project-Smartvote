@@ -12,8 +12,8 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+    e.preventDefault();  // ← THIS MUST BE FIRST!
     console.log('🔵 Form submitted!');
     console.log('📧 Email:', email);
     console.log('🔑 Password:', password);
@@ -22,35 +22,15 @@ const Login = () => {
     setError('');
 
     try {
-      console.log('🔄 Calling loginUser...');
-      const result = await loginUser({ email, password });
-      console.log('📝 Login result:', result);
-      
-      if (result.success) {
-        console.log('✅ Login successful!');
-        login(result.data);
-        console.log('👤 User data saved:', result.data);
-        console.log('🎯 Role:', result.data.role);
-        
-        if (result.data.role === 'admin') {
-          console.log('➡️ Redirecting to admin dashboard...');
-          navigate('/admin/dashboard');
-        } else {
-          console.log('➡️ Redirecting to home...');
-          navigate('/');
-        }
-      } else {
-        console.log('❌ Login failed:', result.message);
-        setError(result.message || 'Login failed. Please check your credentials.');
-      }
+        console.log('🔄 Calling loginUser...');
+        const result = await loginUser({ email, password });
+        console.log('📝 Login result:', result);
+        // ... rest of code
     } catch (error) {
-      console.error('💥 Unexpected error:', error);
-      setError('An unexpected error occurred. Please try again.');
+        console.error('💥 Error:', error);
     }
-    
     setLoading(false);
-  };
-
+};
   return (
     <section className="section" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center' }}>
       <div className="form-container">

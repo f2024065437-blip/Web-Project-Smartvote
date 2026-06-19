@@ -11,7 +11,8 @@ const app = express();
 
 app.use(cors({
     origin: [
-        'https://web-project-smartvote.vercel.app',  // ← YOUR ACTUAL URL
+        'https://web-project-smartvote-mamr8gwfq-saif23.vercel.app',  // ← YOUR ACTUAL URL
+        'https://web-project-smartvote.vercel.app',
         'https://smartvote.vercel.app',
         'http://localhost:3000'
     ],

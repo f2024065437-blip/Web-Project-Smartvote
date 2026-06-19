@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const { executeQuery, getOne, insertOne, updateRecord } = require('../config/database');
 
 const generateToken = (id, email, role) => {
-    return jwt.sign({ id, email, role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
+    return jwt.sign({ id, email, role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '7d' });
 };
 
 const generateRandomToken = () => crypto.randomBytes(32).toString('hex');
@@ -30,7 +30,7 @@ const register = async (req, res) => {
     }
 
     // Check if user exists
-    const existingUser = await getOne('SELECT id FROM users WHERE email = ?', [email]);
+    const existingUser = await getOne('SELECT id FROM users WHERE email = $1', [email]);
     if (existingUser.success && existingUser.data) {
         return res.status(400).json({ 
             success: false, 
@@ -42,11 +42,12 @@ const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = generateRandomToken();
 
-       const result = await insertOne(
-    `INSERT INTO users (fullname, email, password, department, student_id, verification_token, email_verified) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-    [fullname, email, hashedPassword, department || null, student_id || null, verificationToken, true]
-);
+        const result = await insertOne(
+            `INSERT INTO users (fullname, email, password, department, student_id, verification_token, email_verified) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+            [fullname, email, hashedPassword, department || null, student_id || null, verificationToken, true]
+        );
+
         if (result.success) {
             console.log(`✅ User registered: ${email}`);
             res.status(201).json({
@@ -73,16 +74,17 @@ const register = async (req, res) => {
 const verifyEmail = async (req, res) => {
     const { token } = req.params;
     
-    const user = await getOne('SELECT id FROM users WHERE verification_token = ? AND email_verified = 0', [token]);
+    const user = await getOne('SELECT id FROM users WHERE verification_token = $1 AND email_verified = false', [token]);
     
     if (!user.success || !user.data) {
         return res.status(400).json({ success: false, message: 'Invalid or expired token' });
     }
     
-    await updateRecord('UPDATE users SET email_verified = 1, verification_token = NULL WHERE id = ?', [user.data.id]);
+    await updateRecord('UPDATE users SET email_verified = true, verification_token = NULL WHERE id = $1', [user.data.id]);
     
     res.json({ success: true, message: 'Email verified successfully!' });
 };
+
 const login = async (req, res) => {
     const { email, password } = req.body;
     
@@ -130,6 +132,7 @@ const login = async (req, res) => {
         console.log('✅ Password valid:', isValid);
         
         if (!isValid) {
+            console.log('❌ Password invalid');
             return res.status(401).json({ 
                 success: false, 
                 message: 'Invalid credentials' 
@@ -168,9 +171,10 @@ const login = async (req, res) => {
         });
     }
 };
+
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
-    const user = await getOne('SELECT * FROM users WHERE email = ?', [email]);
+    const user = await getOne('SELECT * FROM users WHERE email = $1', [email]);
     
     if (user.success && user.data) {
         const resetToken = generateRandomToken();
@@ -178,7 +182,7 @@ const forgotPassword = async (req, res) => {
         expiry.setHours(expiry.getHours() + 1);
         
         await insertOne(
-            `INSERT INTO password_reset_tokens (user_id, user_type, token, expires_at) VALUES (?, ?, ?, ?)`,
+            `INSERT INTO password_reset_tokens (user_id, user_type, token, expires_at) VALUES ($1, $2, $3, $4)`,
             [user.data.id, 'voter', resetToken, expiry]
         );
         
@@ -192,7 +196,7 @@ const resetPassword = async (req, res) => {
     const { token, newPassword } = req.body;
     
     const resetToken = await getOne(
-        `SELECT * FROM password_reset_tokens WHERE token = ? AND used = 0 AND expires_at > NOW()`,
+        `SELECT * FROM password_reset_tokens WHERE token = $1 AND used = false AND expires_at > NOW()`,
         [token]
     );
     
@@ -201,8 +205,8 @@ const resetPassword = async (req, res) => {
     }
     
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await updateRecord('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, resetToken.data.user_id]);
-    await updateRecord('UPDATE password_reset_tokens SET used = 1 WHERE id = ?', [resetToken.data.id]);
+    await updateRecord('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, resetToken.data.user_id]);
+    await updateRecord('UPDATE password_reset_tokens SET used = true WHERE id = $1', [resetToken.data.id]);
     
     res.json({ success: true, message: 'Password reset successful!' });
 };
@@ -217,9 +221,9 @@ const getMe = async (req, res) => {
     
     let user;
     if (role === 'admin') {
-        user = await getOne('SELECT id, username, email, fullname, role FROM admins WHERE id = ?', [userId]);
+        user = await getOne('SELECT id, username, email, fullname, role FROM admins WHERE id = $1', [userId]);
     } else {
-        user = await getOne('SELECT id, fullname, email, department, student_id, role, email_verified FROM users WHERE id = ?', [userId]);
+        user = await getOne('SELECT id, fullname, email, department, student_id, role, email_verified FROM users WHERE id = $1', [userId]);
     }
     
     res.json({ success: true, data: user.data });
@@ -230,15 +234,15 @@ const createAdminIfMissing = async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash('admin123', 10);
         
-        const existing = await getOne('SELECT * FROM admins WHERE email = ?', ['admin@smartvote.com']);
+        const existing = await getOne('SELECT * FROM admins WHERE email = $1', ['admin@smartvote.com']);
         
         if (existing.success && existing.data) {
-            await updateRecord('UPDATE admins SET password = ? WHERE email = ?', [hashedPassword, 'admin@smartvote.com']);
+            await updateRecord('UPDATE admins SET password = $1 WHERE email = $2', [hashedPassword, 'admin@smartvote.com']);
             return res.json({ success: true, message: 'Admin password updated!' });
         }
         
         const result = await insertOne(
-            'INSERT INTO admins (username, email, password, fullname, role) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO admins (username, email, password, fullname, role) VALUES ($1, $2, $3, $4, $5) RETURNING id',
             ['admin', 'admin@smartvote.com', hashedPassword, 'System Administrator', 'super_admin']
         );
         

@@ -56,29 +56,40 @@ const Login = () => {
             />
           </div>
           
-          <div className="form-group" style={{ position: 'relative' }}>
-            <label className="form-label">Password</label>
-            <input 
-              type={showPassword ? 'text' : 'password'} 
-              className="form-input" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required 
-              placeholder="••••••••"
-              style={{ paddingRight: '45px' }}
-            />
-          <button 
-    type="submit" 
-    onClick={(e) => {
-        e.preventDefault();
-        handleSubmit(e);
-    }}
-    // ... rest of styles
->
-    {loading ? 'Logging in...' : 'Login'}
-</button>
-          </div>
-          
+          <div>
+    <div className="form-group">
+        <label className="form-label">Email</label>
+        <input 
+            type="email" 
+            className="form-input" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required 
+            placeholder="admin@smartvote.com"
+        />
+    </div>
+    
+    <div className="form-group" style={{ position: 'relative' }}>
+        <label className="form-label">Password</label>
+        <input 
+            type={showPassword ? 'text' : 'password'} 
+            className="form-input" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required 
+            placeholder="••••••••"
+            style={{ paddingRight: '45px' }}
+        />
+        {/* ... password toggle button ... */}
+    </div>
+    
+    <button 
+        onClick={handleSubmit}  // ← Direct click, not form submit
+        // ... styles
+    >
+        {loading ? 'Logging in...' : 'Login'}
+    </button>
+</div>          
           <div style={{ textAlign: 'right', marginBottom: '1.5rem' }}>
             <Link to="/forgot-password" style={{ color: 'var(--primary)', fontSize: '0.875rem' }}>
               Forgot password?

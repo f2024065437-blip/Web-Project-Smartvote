@@ -196,9 +196,11 @@ const Navbar = () => {
                 Profile
               </Link>
 
+              {/* ✅ UPDATED: Admin Dropdown with Menu */}
               {isAdmin && (
-                <div style={{ position: 'relative', display: 'inline-block' }}>
+                <div className="admin-dropdown" style={{ position: 'relative', display: 'inline-block' }}>
                   <button
+                    className="admin-dropdown-btn"
                     style={{
                       padding: '0.5rem 1rem',
                       fontSize: '0.85rem',
@@ -223,8 +225,71 @@ const Navbar = () => {
                       e.target.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.3)';
                     }}
                   >
-                    ⚡ Admin
+                    ⚡ Admin Panel ▼
                   </button>
+                  <div 
+                    className="admin-dropdown-content"
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: '0',
+                      marginTop: '0.5rem',
+                      background: isDark ? '#1e293b' : 'white',
+                      border: `1px solid ${isDark ? 'rgba(51, 65, 85, 0.5)' : 'rgba(229, 231, 235, 0.5)'}`,
+                      borderRadius: '8px',
+                      minWidth: '200px',
+                      boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                      zIndex: 1000,
+                      display: 'none',
+                      padding: '0.5rem 0'
+                    }}
+                  >
+                    <Link to="/admin/dashboard" style={{ 
+                      display: 'block', 
+                      padding: '0.6rem 1.2rem', 
+                      textDecoration: 'none', 
+                      color: isDark ? '#e2e8f0' : '#1e293b',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      📊 Dashboard
+                    </Link>
+                    <Link to="/admin/elections" style={{ 
+                      display: 'block', 
+                      padding: '0.6rem 1.2rem', 
+                      textDecoration: 'none', 
+                      color: isDark ? '#e2e8f0' : '#1e293b',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      🗳️ Elections
+                    </Link>
+                    <Link to="/admin/candidates" style={{ 
+                      display: 'block', 
+                      padding: '0.6rem 1.2rem', 
+                      textDecoration: 'none', 
+                      color: isDark ? '#e2e8f0' : '#1e293b',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      👥 Candidates
+                    </Link>
+                    <Link to="/admin/users" style={{ 
+                      display: 'block', 
+                      padding: '0.6rem 1.2rem', 
+                      textDecoration: 'none', 
+                      color: isDark ? '#e2e8f0' : '#1e293b',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      👤 Users
+                    </Link>
+                    <Link to="/admin/reports" style={{ 
+                      display: 'block', 
+                      padding: '0.6rem 1.2rem', 
+                      textDecoration: 'none', 
+                      color: isDark ? '#e2e8f0' : '#1e293b',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      📈 Reports
+                    </Link>
+                  </div>
                 </div>
               )}
 
@@ -378,6 +443,15 @@ const Navbar = () => {
       )}
 
       <style>{`
+        .admin-dropdown:hover .admin-dropdown-content {
+          display: block !important;
+        }
+        
+        .admin-dropdown-content a:hover {
+          background: rgba(99, 102, 241, 0.1) !important;
+          color: #6366f1 !important;
+        }
+
         @media (max-width: 768px) {
           .nav-links-desktop {
             display: none !important;

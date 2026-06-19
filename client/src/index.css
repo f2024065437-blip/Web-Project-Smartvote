@@ -980,46 +980,60 @@ body.dark .admin-dropdown-content {
     background: #1e293b !important;
     border-color: #334155 !important;
 }
-/* Admin Dropdown - Hover to Show */
+
+/* Admin Dropdown */
+.admin-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.admin-dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    min-width: 200px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    z-index: 1000;
+    padding: 0.5rem 0;
+}
+
 .admin-dropdown:hover .admin-dropdown-content {
     display: block !important;
 }
 
-/* Light Mode */
-.admin-dropdown-content {
-    background: white !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
-}
-
 .admin-dropdown-content a {
-    color: #1e293b !important;
-    padding: 0.6rem 1.2rem !important;
-    display: block !important;
-    text-decoration: none !important;
-    transition: all 0.2s ease !important;
+    display: block;
+    padding: 0.6rem 1.2rem;
+    text-decoration: none;
+    color: #1e293b;
+    transition: all 0.2s ease;
 }
 
 .admin-dropdown-content a:hover {
-    background: #f1f5f9 !important;
-    color: #6366f1 !important;
+    background: #f1f5f9;
+    color: #6366f1;
 }
 
 /* Dark Mode */
 body.dark .admin-dropdown-content {
-    background: #1e293b !important;
-    border-color: #334155 !important;
+    background: #1e293b;
+    border-color: #334155;
 }
 
 body.dark .admin-dropdown-content a {
-    color: #e2e8f0 !important;
+    color: #e2e8f0;
 }
 
 body.dark .admin-dropdown-content a:hover {
-    background: #334155 !important;
-    color: #6366f1 !important;
+    background: #334155;
+    color: #6366f1;
 }
+
 /* Stats cards in dark mode */
 body.dark .stat-card {
     background: #1e293b !important;

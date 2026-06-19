@@ -42,11 +42,15 @@ const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = generateRandomToken();
 
-        const result = await insertOne(
-            `INSERT INTO users (fullname, email, password, department, student_id, verification_token, email_verified) 
-             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-            [fullname, email, hashedPassword, department || null, student_id || null, verificationToken, true]
-        );
+        // ✅ Use $1, $2, $3 for PostgreSQL
+const result = await insertOne(
+    `INSERT INTO users (fullname, email, password, department, student_id, verification_token, email_verified) 
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+    [fullname, email, hashedPassword, department || null, student_id || null, verificationToken, true]
+);
+
+// ✅ Use $1 in queries
+const existingUser = await getOne('SELECT id FROM users WHERE email = $1', [email]);
 
         if (result.success) {
             console.log(`✅ User registered: ${email}`);

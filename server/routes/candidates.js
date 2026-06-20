@@ -17,6 +17,7 @@ router.get('/:id', verifyToken, async (req, res) => {
 });
 
 router.post('/', verifyToken, isAdmin, async (req, res) => {
+    console.log('📝 Adding candidate by:', req.user?.email);
     const { election_id, name, party, department, manifesto } = req.body;
     
     const result = await insertOne(

@@ -23,13 +23,14 @@ const verifyToken = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-    if (req.user.role !== 'admin') {
-        return res.status(403).json({
-            success: false,
-            message: 'Admin access required'
-        });
-    }
-    next();
+  console.log('🔍 isAdmin - User role:', req.user?.role);
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'Admin access required'
+    });
+  }
+  next();
 };
 
 const isVoter = (req, res, next) => {

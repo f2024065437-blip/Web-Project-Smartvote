@@ -244,61 +244,66 @@ const Navbar = () => {
                       position: 'absolute',
                       top: '100%',
                       left: '0',
-                      marginTop: '0.5rem',
+                      marginTop: '0',
+                      paddingTop: '0.5rem',
+                      background: 'transparent',
+                      zIndex: 1000,
+                      minWidth: '200px'
+                    }}
+                  >
+                    <div style={{
                       background: isDark ? '#1e293b' : 'white',
                       border: `1px solid ${isDark ? 'rgba(51, 65, 85, 0.5)' : 'rgba(229, 231, 235, 0.5)'}`,
                       borderRadius: '8px',
-                      minWidth: '200px',
                       boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                      zIndex: 1000,
                       padding: '0.5rem 0'
-                    }}
-                  >
-                    <Link to="/admin/dashboard" style={{ 
-                      display: 'block', 
-                      padding: '0.6rem 1.2rem', 
-                      textDecoration: 'none', 
-                      color: isDark ? '#e2e8f0' : '#1e293b',
-                      transition: 'all 0.2s ease'
                     }}>
-                      📊 Dashboard
-                    </Link>
-                    <Link to="/admin/elections" style={{ 
-                      display: 'block', 
-                      padding: '0.6rem 1.2rem', 
-                      textDecoration: 'none', 
-                      color: isDark ? '#e2e8f0' : '#1e293b',
-                      transition: 'all 0.2s ease'
-                    }}>
-                      🗳️ Elections
-                    </Link>
-                    <Link to="/admin/candidates" style={{ 
-                      display: 'block', 
-                      padding: '0.6rem 1.2rem', 
-                      textDecoration: 'none', 
-                      color: isDark ? '#e2e8f0' : '#1e293b',
-                      transition: 'all 0.2s ease'
-                    }}>
-                      👥 Candidates
-                    </Link>
-                    <Link to="/admin/users" style={{ 
-                      display: 'block', 
-                      padding: '0.6rem 1.2rem', 
-                      textDecoration: 'none', 
-                      color: isDark ? '#e2e8f0' : '#1e293b',
-                      transition: 'all 0.2s ease'
-                    }}>
-                      👤 Users
-                    </Link>
-                    <Link to="/admin/reports" style={{ 
-                      display: 'block', 
-                      padding: '0.6rem 1.2rem', 
-                      textDecoration: 'none', 
-                      color: isDark ? '#e2e8f0' : '#1e293b',
-                      transition: 'all 0.2s ease'
-                    }}>
-                      📈 Reports
-                    </Link>
+                      <Link to="/admin/dashboard" style={{ 
+                        display: 'block', 
+                        padding: '0.6rem 1.2rem', 
+                        textDecoration: 'none', 
+                        color: isDark ? '#e2e8f0' : '#1e293b',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        📊 Dashboard
+                      </Link>
+                      <Link to="/admin/elections" style={{ 
+                        display: 'block', 
+                        padding: '0.6rem 1.2rem', 
+                        textDecoration: 'none', 
+                        color: isDark ? '#e2e8f0' : '#1e293b',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        🗳️ Elections
+                      </Link>
+                      <Link to="/admin/candidates" style={{ 
+                        display: 'block', 
+                        padding: '0.6rem 1.2rem', 
+                        textDecoration: 'none', 
+                        color: isDark ? '#e2e8f0' : '#1e293b',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        👥 Candidates
+                      </Link>
+                      <Link to="/admin/users" style={{ 
+                        display: 'block', 
+                        padding: '0.6rem 1.2rem', 
+                        textDecoration: 'none', 
+                        color: isDark ? '#e2e8f0' : '#1e293b',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        👤 Users
+                      </Link>
+                      <Link to="/admin/reports" style={{ 
+                        display: 'block', 
+                        padding: '0.6rem 1.2rem', 
+                        textDecoration: 'none', 
+                        color: isDark ? '#e2e8f0' : '#1e293b',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        📈 Reports
+                      </Link>
+                    </div>
                   </div>
                 </div>
               )}

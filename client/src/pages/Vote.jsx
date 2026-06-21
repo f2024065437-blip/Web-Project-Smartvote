@@ -106,27 +106,40 @@ const Vote = () => {
     <section className="section">
       <div className="container">
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h1>🗳️ Cast Your Vote</h1>
+          <h1 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)' }}>🗳️ Cast Your Vote</h1>
           <p style={{ color: 'var(--gray-500)' }}>Select an election and vote for your preferred candidate</p>
           {user && <p style={{ color: 'var(--gray-500)', fontSize: '0.875rem' }}>👤 Logged in as: {user.fullname || user.email}</p>}
         </div>
 
         {/* Election Selector */}
         {elections.length === 0 ? (
-          <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+          <div className="card" style={{ textAlign: 'center', padding: '2rem 1rem' }}>
             <p style={{ fontSize: '1.2rem' }}>📭 No Active Elections</p>
             <p style={{ color: 'var(--gray-500)' }}>There are no active elections available right now. Please check back later.</p>
           </div>
         ) : (
           <>
-            <div className="card" style={{ marginBottom: '2rem' }}>
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                <label style={{ fontWeight: '600' }}>Select Election:</label>
+            <div className="card" style={{ marginBottom: '2rem', padding: '1rem' }}>
+              <div style={{ 
+                display: 'flex', 
+                gap: '1rem', 
+                alignItems: 'center', 
+                flexWrap: 'wrap',
+                flexDirection: window.innerWidth < 768 ? 'column' : 'row'
+              }}>
+                <label style={{ fontWeight: '600', width: window.innerWidth < 768 ? '100%' : 'auto' }}>Select Election:</label>
                 <select 
                   className="form-input" 
                   value={selectedElection?.id || ''}
                   onChange={handleElectionChange}
-                  style={{ flex: 1, minWidth: '200px', padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid var(--gray-300)' }}
+                  style={{ 
+                    flex: 1, 
+                    minWidth: window.innerWidth < 768 ? '100%' : '200px', 
+                    padding: '0.6rem 1rem', 
+                    borderRadius: '8px', 
+                    border: '1px solid var(--gray-300)',
+                    width: window.innerWidth < 768 ? '100%' : 'auto'
+                  }}
                 >
                   {elections.map(election => (
                     <option key={election.id} value={election.id}>
@@ -140,8 +153,8 @@ const Vote = () => {
             {selectedElection && (
               <>
                 <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                  <h2>{selectedElection.title}</h2>
-                  <p style={{ color: 'var(--gray-600)' }}>{selectedElection.description}</p>
+                  <h2 style={{ fontSize: 'clamp(1.3rem, 4vw, 2rem)' }}>{selectedElection.title}</h2>
+                  <p style={{ color: 'var(--gray-600)', fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>{selectedElection.description}</p>
                 </div>
 
                 <CountdownTimer endDate={selectedElection.end_date} />
@@ -150,7 +163,8 @@ const Vote = () => {
                 <div style={{ 
                   display: 'flex', 
                   justifyContent: 'center', 
-                  marginBottom: '2rem' 
+                  marginBottom: '2rem',
+                  padding: '0 0.5rem'
                 }}>
                   <div style={{ 
                     position: 'relative', 
@@ -172,7 +186,7 @@ const Vote = () => {
                       style={{
                         width: '100%',
                         padding: '0.7rem 1rem 0.7rem 2.8rem',
-                        fontSize: '0.95rem',
+                        fontSize: window.innerWidth < 768 ? '16px' : '0.95rem', // Prevents zoom on mobile
                         borderRadius: '10px',
                         border: '2px solid var(--gray-200)',
                         background: 'var(--gray-50)',
@@ -204,7 +218,8 @@ const Vote = () => {
                     padding: '1rem', 
                     borderRadius: '8px', 
                     textAlign: 'center', 
-                    marginBottom: '2rem' 
+                    marginBottom: '2rem',
+                    margin: '0 0.5rem 2rem 0.5rem'
                   }}>
                     ✓ You have already voted in this election. Thank you for participating!
                     <br />
@@ -239,7 +254,7 @@ const Vote = () => {
                 )}
                 
                 {filteredCandidates.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '2rem' }}>
+                  <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
                     <p>No candidates found for this election.</p>
                     <Link 
                       to="/results" 
@@ -274,12 +289,13 @@ const Vote = () => {
                   </div>
                 ) : (
                   <>
-                    {/* Balanced Candidate Cards Grid */}
+                    {/* Balanced Candidate Cards Grid - Mobile Optimized */}
                     <div style={{ 
                       display: 'grid', 
                       gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
                       gap: '1.5rem',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      padding: '0 0.5rem'
                     }}>
                       {filteredCandidates.map(candidate => (
                         <CandidateCard 
@@ -295,9 +311,10 @@ const Vote = () => {
                     <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
                       <Link 
                         to="/results" 
+                        className="btn btn-outline"
                         style={{
                           padding: '0.6rem 1.8rem',
-                          fontSize: '0.95rem',
+                          fontSize: window.innerWidth < 768 ? '0.9rem' : '0.95rem',
                           fontWeight: '600',
                           borderRadius: '8px',
                           border: '2px solid #6366f1',
@@ -305,7 +322,10 @@ const Vote = () => {
                           background: 'transparent',
                           textDecoration: 'none',
                           display: 'inline-block',
-                          transition: 'all 0.3s ease'
+                          transition: 'all 0.3s ease',
+                          width: window.innerWidth < 768 ? '100%' : 'auto',
+                          maxWidth: window.innerWidth < 768 ? '300px' : 'none',
+                          margin: '0 auto'
                         }}
                         onMouseEnter={(e) => {
                           e.target.style.background = '#6366f1';

@@ -31,6 +31,7 @@ const Home = () => {
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link 
               to="/vote" 
+              className="btn btn-primary btn-large"
               style={{
                 padding: '0.75rem 2rem',
                 fontSize: '1rem',
@@ -41,7 +42,8 @@ const Home = () => {
                 textDecoration: 'none',
                 transition: 'all 0.3s ease',
                 boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)',
-                display: 'inline-block'
+                display: 'inline-block',
+                width: 'auto'
               }}
               onMouseEnter={(e) => {
                 e.target.style.background = '#4f46e5';
@@ -58,6 +60,7 @@ const Home = () => {
             </Link>
             <Link 
               to="/results" 
+              className="btn btn-outline btn-large"
               style={{
                 padding: '0.75rem 2rem',
                 fontSize: '1rem',
@@ -68,7 +71,8 @@ const Home = () => {
                 background: 'transparent',
                 textDecoration: 'none',
                 transition: 'all 0.3s ease',
-                display: 'inline-block'
+                display: 'inline-block',
+                width: 'auto'
               }}
               onMouseEnter={(e) => {
                 e.target.style.background = '#6366f1';
@@ -109,6 +113,7 @@ const Home = () => {
                   <p>📅 Ends: {new Date(election.end_date).toLocaleDateString()}</p>
                   <Link 
                     to="/vote" 
+                    className="btn btn-primary"
                     style={{
                       marginTop: '1rem',
                       padding: '0.6rem 1.5rem',
@@ -120,7 +125,8 @@ const Home = () => {
                       textDecoration: 'none',
                       display: 'inline-block',
                       transition: 'all 0.3s ease',
-                      boxShadow: '0 2px 6px rgba(99, 102, 241, 0.25)'
+                      boxShadow: '0 2px 6px rgba(99, 102, 241, 0.25)',
+                      width: 'auto'
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.background = '#4f46e5';
@@ -146,20 +152,20 @@ const Home = () => {
         <div className="container">
           <h2 style={{ textAlign: 'center', marginBottom: '3rem' }}>Why Choose SmartVote?</h2>
           <div className="grid-3">
-            <div className="card">
+            <div className="card" style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🔒</div>
               <h3>Secure & Anonymous</h3>
-              <p>Your vote is encrypted and completely anonymous.</p>
+              <p style={{ color: 'var(--gray-600)' }}>Your vote is encrypted and completely anonymous.</p>
             </div>
-            <div className="card">
+            <div className="card" style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⚡</div>
               <h3>Real-Time Results</h3>
-              <p>Watch votes update instantly with live charts.</p>
+              <p style={{ color: 'var(--gray-600)' }}>Watch votes update instantly with live charts.</p>
             </div>
-            <div className="card">
+            <div className="card" style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🌓</div>
               <h3>Dark Mode</h3>
-              <p>Vote comfortably day or night.</p>
+              <p style={{ color: 'var(--gray-600)' }}>Vote comfortably day or night.</p>
             </div>
           </div>
         </div>

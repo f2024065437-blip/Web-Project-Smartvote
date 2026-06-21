@@ -143,7 +143,7 @@ export const getElectionResults = async (electionId) => {
 
 export const getActiveElections = async () => {
   try {
-    const response = await api.get('/results/active');
+    const response = await api.get('/elections/active'); // ✅ Correct endpoint
     return response.data;
   } catch (error) {
     return { success: false, data: [] };

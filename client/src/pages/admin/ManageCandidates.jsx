@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCandidates, getAllElections } from '../../services/api';
+import { getCandidates, getAllElections, createCandidate, updateCandidate, deleteCandidate } from '../../services/api';
 
 const ManageCandidates = () => {
   const [candidates, setCandidates] = useState([]);
@@ -48,26 +48,12 @@ const ManageCandidates = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const token = localStorage.getItem('token');
-    const url = editing 
-      ? `http://localhost:5000/api/candidates/${editing.id}`
-      : 'http://localhost:5000/api/candidates';
-    
-    const method = editing ? 'PUT' : 'POST';
-    
+
     try {
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      });
-      
-      const result = await response.json();
-      
+      const result = editing
+        ? await updateCandidate(editing.id, formData)
+        : await createCandidate(formData);
+
       if (result.success) {
         alert(result.message);
         loadCandidates();
@@ -84,19 +70,10 @@ const ManageCandidates = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this candidate?')) return;
-    
-    const token = localStorage.getItem('token');
-    
+
     try {
-      const response = await fetch(`http://localhost:5000/api/candidates/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      const result = await response.json();
-      
+      const result = await deleteCandidate(id);
+
       if (result.success) {
         alert(result.message);
         loadCandidates();

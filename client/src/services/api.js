@@ -170,6 +170,42 @@ export const getCandidates = async (electionId) => {
   }
 };
 
+export const createCandidate = async (candidateData) => {
+  try {
+    const response = await api.post('/candidates', candidateData);
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to add candidate'
+    };
+  }
+};
+
+export const updateCandidate = async (id, candidateData) => {
+  try {
+    const response = await api.put(`/candidates/${id}`, candidateData);
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to update candidate'
+    };
+  }
+};
+
+export const deleteCandidate = async (id) => {
+  try {
+    const response = await api.delete(`/candidates/${id}`);
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to delete candidate'
+    };
+  }
+};
+
 // ========== ADMIN APIS ==========
 export const getAdminDashboard = async () => {
   try {

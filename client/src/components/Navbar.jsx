@@ -7,11 +7,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  console.log('🔍 Navbar - User:', user);
-  console.log('🔍 Navbar - User role:', user?.role);
-  console.log('🔍 Navbar - isAdmin:', user?.role === 'admin');
-  console.log('🔍 Navbar - isAuthenticated:', isAuthenticated);
+  const [mobileAdminOpen, setMobileAdminOpen] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -33,16 +29,42 @@ const Navbar = () => {
   };
 
   const handleLogout = async () => {
+    setMobileMenuOpen(false);
     logout();
     navigate('/login');
   };
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+    setMobileAdminOpen(false);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+    setMobileAdminOpen(false);
   };
 
   const isAdmin = user?.role === 'admin';
-  console.log('🔍 Navbar - isAdmin variable:', isAdmin);
+
+  const baseLinks = ['Home', 'Results', 'About', 'Contact'];
+  const adminLinks = [
+    { to: '/admin/dashboard', label: '📊 Dashboard' },
+    { to: '/admin/elections', label: '🗳️ Elections' },
+    { to: '/admin/candidates', label: '👥 Candidates' },
+    { to: '/admin/users', label: '👤 Users' },
+    { to: '/admin/reports', label: '📈 Reports' }
+  ];
+
+  const mobileLinkStyle = {
+    display: 'block',
+    padding: '0.8rem 1.2rem',
+    fontSize: '1rem',
+    fontWeight: '500',
+    color: isDark ? '#e2e8f0' : '#1e293b',
+    textDecoration: 'none',
+    borderRadius: '8px',
+    transition: 'all 0.2s ease'
+  };
 
   return (
     <nav style={{
@@ -64,28 +86,28 @@ const Navbar = () => {
         gap: '1rem'
       }}>
         {/* Logo */}
-        <Link to="/" style={{
+        <Link to="/" onClick={closeMobileMenu} style={{
           display: 'flex',
           alignItems: 'center',
           gap: '0.6rem',
-          textDecoration: 'none',
-          flexShrink: 0
+          textDecoration: 'none'
         }}>
           <div style={{
-            width: 'clamp(36px, 5vw, 42px)',
-            height: 'clamp(36px, 5vw, 42px)',
+            width: '42px',
+            height: '42px',
             background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
             borderRadius: '12px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
+            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+            flexShrink: 0
           }}>
-            <span style={{ fontSize: 'clamp(1rem, 2.5vw, 1.3rem)', color: 'white' }}>🗳️</span>
+            <span style={{ fontSize: '1.3rem', color: 'white' }}>🗳️</span>
           </div>
-          <div style={{ display: window.innerWidth < 480 ? 'none' : 'block' }}>
+          <div>
             <span style={{
-              fontSize: 'clamp(1rem, 3vw, 1.4rem)',
+              fontSize: '1.4rem',
               fontWeight: '800',
               background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
               WebkitBackgroundClip: 'text',
@@ -96,9 +118,9 @@ const Navbar = () => {
             </span>
             <span style={{
               display: 'block',
-              fontSize: '0.4rem',
+              fontSize: '0.5rem',
               fontWeight: '500',
-              color: isDark ? '#94a3b8' : '#94a3b8',
+              color: '#94a3b8',
               letterSpacing: '2px',
               textTransform: 'uppercase',
               marginTop: '-2px'
@@ -108,44 +130,25 @@ const Navbar = () => {
           </div>
         </Link>
 
-        {/* Mobile Menu Button */}
-        <button 
-          onClick={toggleMobileMenu} 
-          style={{
-            display: window.innerWidth < 768 ? 'block' : 'none',
-            background: 'none',
-            border: 'none',
-            fontSize: '1.8rem',
-            cursor: 'pointer',
-            color: isDark ? '#e2e8f0' : '#1e293b',
-            padding: '0.3rem 0.5rem',
-            borderRadius: '8px',
-            transition: 'all 0.2s ease'
-          }}
-        >
-          {mobileMenuOpen ? '✕' : '☰'}
-        </button>
-
-        {/* Navigation Links - Desktop */}
-        <div style={{
-          display: window.innerWidth < 768 ? 'none' : 'flex',
-          gap: '0.3rem',
+        {/* Desktop Navigation - hidden on mobile via CSS below */}
+        <div className="navbar-desktop-nav" style={{
+          display: 'flex',
+          gap: '0.5rem',
           alignItems: 'center',
           flexWrap: 'wrap'
         }}>
-          {['Home', 'Results', 'About', 'Contact'].map((item) => (
+          {baseLinks.map((item) => (
             <Link
               key={item}
               to={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
               style={{
-                padding: '0.4rem 0.7rem',
-                fontSize: '0.8rem',
+                padding: '0.5rem 0.9rem',
+                fontSize: '0.85rem',
                 fontWeight: '500',
                 color: isDark ? '#94a3b8' : '#64748b',
                 textDecoration: 'none',
                 borderRadius: '8px',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
+                transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
                 e.target.style.color = '#6366f1';
@@ -159,20 +162,19 @@ const Navbar = () => {
               {item}
             </Link>
           ))}
-          
+
           {isAuthenticated ? (
             <>
               <Link
                 to="/vote"
                 style={{
-                  padding: '0.4rem 0.7rem',
-                  fontSize: '0.8rem',
+                  padding: '0.5rem 0.9rem',
+                  fontSize: '0.85rem',
                   fontWeight: '500',
                   color: isDark ? '#94a3b8' : '#64748b',
                   textDecoration: 'none',
                   borderRadius: '8px',
-                  transition: 'all 0.2s ease',
-                  whiteSpace: 'nowrap'
+                  transition: 'all 0.2s ease'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.color = '#6366f1';
@@ -188,14 +190,13 @@ const Navbar = () => {
               <Link
                 to="/profile"
                 style={{
-                  padding: '0.4rem 0.7rem',
-                  fontSize: '0.8rem',
+                  padding: '0.5rem 0.9rem',
+                  fontSize: '0.85rem',
                   fontWeight: '500',
                   color: isDark ? '#94a3b8' : '#64748b',
                   textDecoration: 'none',
                   borderRadius: '8px',
-                  transition: 'all 0.2s ease',
-                  whiteSpace: 'nowrap'
+                  transition: 'all 0.2s ease'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.color = '#6366f1';
@@ -210,8 +211,8 @@ const Navbar = () => {
               </Link>
 
               {isAdmin && (
-                <div 
-                  className="admin-dropdown" 
+                <div
+                  className="admin-dropdown"
                   style={{ position: 'relative', display: 'inline-block' }}
                   onMouseEnter={(e) => {
                     const content = e.currentTarget.querySelector('.admin-dropdown-content');
@@ -225,8 +226,8 @@ const Navbar = () => {
                   <button
                     className="admin-dropdown-btn"
                     style={{
-                      padding: '0.4rem 0.8rem',
-                      fontSize: '0.75rem',
+                      padding: '0.5rem 1rem',
+                      fontSize: '0.85rem',
                       fontWeight: '600',
                       borderRadius: '8px',
                       background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
@@ -237,13 +238,12 @@ const Navbar = () => {
                       boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.3rem',
-                      whiteSpace: 'nowrap'
+                      gap: '0.5rem'
                     }}
                   >
-                    ⚡ Admin ▼
+                    ⚡ Admin Panel ▼
                   </button>
-                  <div 
+                  <div
                     className="admin-dropdown-content"
                     style={{
                       display: 'none',
@@ -254,7 +254,7 @@ const Navbar = () => {
                       paddingTop: '0.5rem',
                       background: 'transparent',
                       zIndex: 1000,
-                      minWidth: '180px'
+                      minWidth: '200px'
                     }}
                   >
                     <div style={{
@@ -264,56 +264,17 @@ const Navbar = () => {
                       boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
                       padding: '0.5rem 0'
                     }}>
-                      <Link to="/admin/dashboard" style={{ 
-                        display: 'block', 
-                        padding: '0.5rem 1rem', 
-                        textDecoration: 'none', 
-                        fontSize: '0.8rem',
-                        color: isDark ? '#e2e8f0' : '#1e293b',
-                        transition: 'all 0.2s ease'
-                      }}>
-                        📊 Dashboard
-                      </Link>
-                      <Link to="/admin/elections" style={{ 
-                        display: 'block', 
-                        padding: '0.5rem 1rem', 
-                        textDecoration: 'none', 
-                        fontSize: '0.8rem',
-                        color: isDark ? '#e2e8f0' : '#1e293b',
-                        transition: 'all 0.2s ease'
-                      }}>
-                        🗳️ Elections
-                      </Link>
-                      <Link to="/admin/candidates" style={{ 
-                        display: 'block', 
-                        padding: '0.5rem 1rem', 
-                        textDecoration: 'none', 
-                        fontSize: '0.8rem',
-                        color: isDark ? '#e2e8f0' : '#1e293b',
-                        transition: 'all 0.2s ease'
-                      }}>
-                        👥 Candidates
-                      </Link>
-                      <Link to="/admin/users" style={{ 
-                        display: 'block', 
-                        padding: '0.5rem 1rem', 
-                        textDecoration: 'none', 
-                        fontSize: '0.8rem',
-                        color: isDark ? '#e2e8f0' : '#1e293b',
-                        transition: 'all 0.2s ease'
-                      }}>
-                        👤 Users
-                      </Link>
-                      <Link to="/admin/reports" style={{ 
-                        display: 'block', 
-                        padding: '0.5rem 1rem', 
-                        textDecoration: 'none', 
-                        fontSize: '0.8rem',
-                        color: isDark ? '#e2e8f0' : '#1e293b',
-                        transition: 'all 0.2s ease'
-                      }}>
-                        📈 Reports
-                      </Link>
+                      {adminLinks.map((link) => (
+                        <Link key={link.to} to={link.to} style={{
+                          display: 'block',
+                          padding: '0.6rem 1.2rem',
+                          textDecoration: 'none',
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          transition: 'all 0.2s ease'
+                        }}>
+                          {link.label}
+                        </Link>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -322,16 +283,15 @@ const Navbar = () => {
               <button
                 onClick={handleLogout}
                 style={{
-                  padding: '0.4rem 0.8rem',
-                  fontSize: '0.8rem',
+                  padding: '0.5rem 1.2rem',
+                  fontSize: '0.85rem',
                   fontWeight: '500',
                   borderRadius: '8px',
                   border: `1px solid ${isDark ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.2)'}`,
                   background: 'transparent',
                   color: '#ef4444',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  whiteSpace: 'nowrap'
+                  transition: 'all 0.3s ease'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.background = '#ef4444';
@@ -354,15 +314,14 @@ const Navbar = () => {
               <Link
                 to="/login"
                 style={{
-                  padding: '0.4rem 0.8rem',
-                  fontSize: '0.8rem',
+                  padding: '0.5rem 1.2rem',
+                  fontSize: '0.85rem',
                   fontWeight: '500',
                   borderRadius: '8px',
                   border: `1px solid ${isDark ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.2)'}`,
                   color: '#6366f1',
                   textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  whiteSpace: 'nowrap'
+                  transition: 'all 0.3s ease'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.background = '#6366f1';
@@ -382,16 +341,15 @@ const Navbar = () => {
               <Link
                 to="/register"
                 style={{
-                  padding: '0.4rem 0.8rem',
-                  fontSize: '0.8rem',
+                  padding: '0.5rem 1.2rem',
+                  fontSize: '0.85rem',
                   fontWeight: '600',
                   borderRadius: '8px',
                   background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
                   color: 'white',
                   textDecoration: 'none',
                   transition: 'all 0.3s ease',
-                  boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)',
-                  whiteSpace: 'nowrap'
+                  boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.transform = 'translateY(-2px)';
@@ -411,13 +369,13 @@ const Navbar = () => {
           <button
             onClick={toggleTheme}
             style={{
-              width: 'clamp(34px, 4vw, 38px)',
-              height: 'clamp(34px, 4vw, 38px)',
+              width: '38px',
+              height: '38px',
               borderRadius: '10px',
               border: `1px solid ${isDark ? 'rgba(51, 65, 85, 0.5)' : 'rgba(229, 231, 235, 0.5)'}`,
               background: isDark ? 'rgba(51, 65, 85, 0.3)' : 'rgba(241, 245, 249, 0.5)',
               cursor: 'pointer',
-              fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
+              fontSize: '1.1rem',
               transition: 'all 0.3s ease',
               display: 'flex',
               alignItems: 'center',
@@ -434,194 +392,175 @@ const Navbar = () => {
             {isDark ? '☀️' : '🌙'}
           </button>
         </div>
+
+        {/* Hamburger - hidden on desktop, shown on mobile via CSS below */}
+        <button
+          className="navbar-hamburger"
+          onClick={toggleMobileMenu}
+          aria-label="Toggle menu"
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '1.6rem',
+            cursor: 'pointer',
+            color: isDark ? '#e2e8f0' : '#1e293b',
+            padding: '0.3rem 0.5rem',
+            flexShrink: 0
+          }}
+        >
+          {mobileMenuOpen ? '✕' : '☰'}
+        </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Panel */}
       {mobileMenuOpen && (
         <div style={{
-          display: window.innerWidth < 768 ? 'flex' : 'none',
+          display: 'flex',
           flexDirection: 'column',
-          padding: '1rem 0',
-          gap: '0.5rem',
+          padding: '0.8rem 0',
+          gap: '0.2rem',
           borderTop: `1px solid ${isDark ? 'rgba(51, 65, 85, 0.5)' : 'rgba(229, 231, 235, 0.5)'}`,
           marginTop: '0.8rem'
         }}>
-          {['Home', 'Vote', 'Results', 'About', 'Contact'].map((item) => (
+          {baseLinks.map((item) => (
             <Link
               key={item}
               to={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
-              style={{
-                padding: '0.7rem 0.9rem',
-                fontSize: '1rem',
-                color: isDark ? '#e2e8f0' : '#1e293b',
-                textDecoration: 'none',
-                borderRadius: '8px',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
-              onClick={() => setMobileMenuOpen(false)}
-              onMouseEnter={(e) => {
-                e.target.style.background = isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'transparent';
-              }}
+              style={mobileLinkStyle}
+              onClick={closeMobileMenu}
+              onMouseEnter={(e) => { e.target.style.background = isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.05)'; }}
+              onMouseLeave={(e) => { e.target.style.background = 'transparent'; }}
             >
-              {item === 'Home' && '🏠'}
-              {item === 'Vote' && '🗳️'}
-              {item === 'Results' && '📊'}
-              {item === 'About' && 'ℹ️'}
-              {item === 'Contact' && '📧'}
               {item}
             </Link>
           ))}
-          
-          {isAuthenticated && (
+
+          {isAuthenticated ? (
             <>
-              <Link
-                to="/profile"
-                style={{
-                  padding: '0.7rem 0.9rem',
-                  fontSize: '1rem',
-                  color: isDark ? '#e2e8f0' : '#1e293b',
-                  textDecoration: 'none',
-                  borderRadius: '8px',
-                  transition: 'all 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-                onClick={() => setMobileMenuOpen(false)}
-                onMouseEnter={(e) => {
-                  e.target.style.background = isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.05)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = 'transparent';
-                }}
-              >
-                👤 Profile
-              </Link>
+              <Link to="/vote" style={mobileLinkStyle} onClick={closeMobileMenu}>Vote</Link>
+              <Link to="/profile" style={mobileLinkStyle} onClick={closeMobileMenu}>Profile</Link>
+
               {isAdmin && (
-                <>
-                  <Link
-                    to="/admin/dashboard"
+                <div>
+                  <button
+                    onClick={() => setMobileAdminOpen(!mobileAdminOpen)}
                     style={{
-                      padding: '0.7rem 0.9rem',
-                      fontSize: '1rem',
-                      color: isDark ? '#e2e8f0' : '#1e293b',
-                      textDecoration: 'none',
-                      borderRadius: '8px',
-                      transition: 'all 0.2s ease',
+                      width: '100%',
                       display: 'flex',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
-                      gap: '0.5rem',
-                      background: 'rgba(99, 102, 241, 0.1)'
+                      padding: '0.8rem 1.2rem',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                      color: 'white',
+                      cursor: 'pointer',
+                      marginTop: '0.3rem'
                     }}
-                    onClick={() => setMobileMenuOpen(false)}
                   >
-                    ⚡ Admin Panel
-                  </Link>
-                </>
+                    <span>⚡ Admin Panel</span>
+                    <span>{mobileAdminOpen ? '▲' : '▼'}</span>
+                  </button>
+                  {mobileAdminOpen && (
+                    <div style={{ paddingLeft: '0.8rem', marginTop: '0.2rem' }}>
+                      {adminLinks.map((link) => (
+                        <Link
+                          key={link.to}
+                          to={link.to}
+                          style={{ ...mobileLinkStyle, fontSize: '0.9rem' }}
+                          onClick={closeMobileMenu}
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               )}
+
               <button
-                onClick={() => {
-                  handleLogout();
-                  setMobileMenuOpen(false);
-                }}
+                onClick={handleLogout}
                 style={{
-                  padding: '0.7rem 0.9rem',
+                  marginTop: '0.5rem',
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '0.8rem 1.2rem',
                   fontSize: '1rem',
                   fontWeight: '500',
                   borderRadius: '8px',
                   border: `1px solid ${isDark ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.2)'}`,
                   background: 'transparent',
                   color: '#ef4444',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  textAlign: 'left',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = '#ef4444';
-                  e.target.style.color = 'white';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = 'transparent';
-                  e.target.style.color = '#ef4444';
+                  cursor: 'pointer'
                 }}
               >
-                🚪 Logout
+                Logout
               </button>
             </>
-          )}
-          
-          {!isAuthenticated && (
+          ) : (
             <>
               <Link
                 to="/login"
-                style={{
-                  padding: '0.7rem 0.9rem',
-                  fontSize: '1rem',
-                  fontWeight: '500',
-                  borderRadius: '8px',
-                  border: `1px solid ${isDark ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.2)'}`,
-                  color: '#6366f1',
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  textAlign: 'center'
-                }}
-                onClick={() => setMobileMenuOpen(false)}
+                style={{ ...mobileLinkStyle, color: '#6366f1', fontWeight: '600' }}
+                onClick={closeMobileMenu}
               >
                 Login
               </Link>
               <Link
                 to="/register"
                 style={{
-                  padding: '0.7rem 0.9rem',
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  borderRadius: '8px',
+                  ...mobileLinkStyle,
                   background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
                   color: 'white',
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  textAlign: 'center'
+                  fontWeight: '600',
+                  marginTop: '0.3rem'
                 }}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={closeMobileMenu}
               >
                 Sign up
               </Link>
             </>
           )}
-          
+
           <button
-            onClick={() => {
-              toggleTheme();
-              setMobileMenuOpen(false);
-            }}
+            onClick={toggleTheme}
             style={{
-              padding: '0.7rem 0.9rem',
-              fontSize: '1rem',
-              borderRadius: '8px',
-              border: `1px solid ${isDark ? 'rgba(51, 65, 85, 0.5)' : 'rgba(229, 231, 235, 0.5)'}`,
-              background: 'transparent',
-              cursor: 'pointer',
-              color: isDark ? '#e2e8f0' : '#1e293b',
-              transition: 'all 0.3s ease',
+              marginTop: '0.5rem',
+              width: '100%',
               textAlign: 'left',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.6rem',
+              padding: '0.8rem 1.2rem',
+              fontSize: '1rem',
+              fontWeight: '500',
+              borderRadius: '8px',
+              border: `1px solid ${isDark ? 'rgba(51, 65, 85, 0.5)' : 'rgba(229, 231, 235, 0.5)'}`,
+              background: 'transparent',
+              color: isDark ? '#e2e8f0' : '#1e293b',
+              cursor: 'pointer'
             }}
           >
             {isDark ? '☀️ Light Mode' : '🌙 Dark Mode'}
           </button>
         </div>
       )}
+
+      <style>{`
+        .navbar-hamburger {
+          display: none;
+        }
+        @media (max-width: 768px) {
+          .navbar-desktop-nav {
+            display: none !important;
+          }
+          .navbar-hamburger {
+            display: block !important;
+          }
+        }
+      `}</style>
     </nav>
   );
 };

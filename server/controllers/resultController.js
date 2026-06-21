@@ -2,30 +2,30 @@ const { executeQuery, getOne } = require('../config/database');
 
 const getElectionResults = async (req, res) => {
     const { id } = req.params;
-    
-    const election = await getOne('SELECT * FROM elections WHERE id = ?', [id]);
+
+    const election = await getOne('SELECT * FROM elections WHERE id = $1', [id]);
     if (!election.success || !election.data) {
         return res.status(404).json({ success: false, message: 'Election not found' });
     }
-    
+
     const candidates = await executeQuery(
         `SELECT c.*, COUNT(v.id) as vote_count 
          FROM candidates c 
          LEFT JOIN votes v ON c.id = v.candidate_id 
-         WHERE c.election_id = ? 
+         WHERE c.election_id = $1 
          GROUP BY c.id 
          ORDER BY vote_count DESC`,
         [id]
     );
-    
-    const totalVotes = await getOne('SELECT COUNT(*) as total FROM votes WHERE election_id = ?', [id]);
+
+    const totalVotes = await getOne('SELECT COUNT(*) as total FROM votes WHERE election_id = $1', [id]);
     const total = totalVotes.success ? totalVotes.data.total : 0;
-    
+
     const candidatesWithPercentage = candidates.success ? candidates.data.map(c => ({
         ...c,
         percentage: total > 0 ? ((c.vote_count / total) * 100).toFixed(1) : 0
     })) : [];
-    
+
     res.json({
         success: true,
         data: {
@@ -40,9 +40,12 @@ const getElectionResults = async (req, res) => {
 const getActiveElections = async (req, res) => {
     const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
     const elections = await executeQuery(
-        `SELECT * FROM elections WHERE start_date <= ? AND end_date >= ? AND status = 'active' ORDER BY end_date ASC`,
+        `SELECT * FROM elections WHERE start_date <= $1 AND end_date >= $2 AND status = 'active' ORDER BY end_date ASC`,
         [now, now]
     );
+    if (!elections.success) {
+        console.error('❌ getActiveElections query error:', elections.error);
+    }
     res.json({ success: true, data: elections.success ? elections.data : [] });
 };
 
@@ -56,6 +59,9 @@ const getAllElectionsResults = async (req, res) => {
          GROUP BY e.id
          ORDER BY e.created_at DESC`
     );
+    if (!elections.success) {
+        console.error('❌ getAllElectionsResults query error:', elections.error);
+    }
     res.json({ success: true, data: elections.success ? elections.data : [] });
 };
 

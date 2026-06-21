@@ -16,7 +16,7 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  console.log('🔑 Request config:', config);  // ✅ Debug log
+  console.log('🔑 Request config:', config);
   return config;
 });
 
@@ -143,7 +143,7 @@ export const getElectionResults = async (electionId) => {
 
 export const getActiveElections = async () => {
   try {
-    const response = await api.get('/elections/active'); // ✅ Correct endpoint
+    const response = await api.get('/results/active');
     return response.data;
   } catch (error) {
     return { success: false, data: [] };

@@ -42,15 +42,11 @@ const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = generateRandomToken();
 
-        // ✅ Use $1, $2, $3 for PostgreSQL
-const result = await insertOne(
-    `INSERT INTO users (fullname, email, password, department, student_id, verification_token, email_verified) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-    [fullname, email, hashedPassword, department || null, student_id || null, verificationToken, true]
-);
-
-// ✅ Use $1 in queries
-const existingUser = await getOne('SELECT id FROM users WHERE email = $1', [email]);
+        const result = await insertOne(
+            `INSERT INTO users (fullname, email, password, department, student_id, verification_token, email_verified) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+            [fullname, email, hashedPassword, department || null, student_id || null, verificationToken, true]
+        );
 
         if (result.success) {
             console.log(`✅ User registered: ${email}`);
@@ -102,7 +98,7 @@ const login = async (req, res) => {
     }
     
     try {
-        // ✅ Admin table check karo (admin@smartvote.com)
+        // Check admin table (admin@smartvote.com)
         const adminResult = await getOne('SELECT * FROM admins WHERE email = $1', [email]);
         
         let user = null;
@@ -115,7 +111,7 @@ const login = async (req, res) => {
             isAdmin = true;
             console.log('✅ Admin found in admins table');
         } else {
-            // ✅ User table check karo (normal users)
+            // Check user table (normal users)
             const userResult = await getOne('SELECT * FROM users WHERE email = $1', [email]);
             if (userResult.success && userResult.data) {
                 user = userResult.data;
@@ -135,7 +131,7 @@ const login = async (req, res) => {
         console.log('👤 User found:', user.email);
         console.log('🎭 Role:', role);
         
-        // ✅ Password check
+        // Check password
         const isValid = await bcrypt.compare(password, user.password);
         console.log('✅ Password match:', isValid);
         
@@ -147,7 +143,7 @@ const login = async (req, res) => {
             });
         }
         
-        // ✅ Token generate karo
+        // Generate token
         const token = jwt.sign(
             { 
                 id: user.id, 
@@ -179,6 +175,7 @@ const login = async (req, res) => {
         });
     }
 };
+
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
     const user = await getOne('SELECT * FROM users WHERE email = $1', [email]);
@@ -236,7 +233,6 @@ const getMe = async (req, res) => {
     res.json({ success: true, data: user.data });
 };
 
-// Create admin if missing
 const createAdminIfMissing = async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash('admin123', 10);
